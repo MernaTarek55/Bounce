@@ -8,7 +8,8 @@ Flag::Flag(b2World* world, float x, float y, float width, float height, const st
     if (!texture.loadFromFile(texturePath)) {
         std::cerr << "Failed to load texture: " << texturePath << std::endl;
     }
-
+    posx = x;
+    posy = y;
     // Set up the sprite
     sprite.setTexture(texture);
     sprite.setOrigin(width / 2, height / 2);
@@ -66,4 +67,9 @@ void Flag::onCollision() {
 
 b2Body* Flag::getBody() {
     return body;
+}
+
+sf::Vector2f Flag::getposition()
+{
+    return sf::Vector2f(posx, posy);
 }

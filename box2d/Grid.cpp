@@ -84,6 +84,7 @@ void Grid::drawWalls(sf::RenderWindow& window, const std::vector<std::vector<cha
 
                 if (textureIndex >= 0 && textureIndex < 24) {
                     sf::RectangleShape cell(sf::Vector2f(cellSizeXX, cellSizeYY));
+                    cell.setOrigin(cell.getSize().x / 2, cell.getSize().y / 2);
                     cell.setPosition(col * cellSizeXX, row * cellSizeYY);
 
                     cell.setTexture(&textures[textureIndex]);

@@ -47,7 +47,7 @@ int main() {
     // Initialize Box2D world with gravity
     b2Vec2 gravity(0.0f, 9.8f);
     b2World world(gravity);
-
+    //world.IsLocked()
     // Load the grid and textures
     Grid gridMap;
     std::vector<Position> emptyPositions;
@@ -133,8 +133,8 @@ int main() {
     Ball ball(&world, 80, 150, ballTexture);
     Flag flag(&world, 1000.0f, 800.0f, 100.0f, 100.0f, "Textures/flag.png");
     Water water(&world, 529, 1050, 262, 500);
-    // Create the player's dynamic circle body in Box2D
-
+    
+    Spike spike(&world, sf::Vector2f( 230.0f, 230.0f ), sf::Vector2f( 100.0f, 100.0f ), "Textures/spike.png");
     MovingColliders collider(world, sf::Vector2f(22.5f, 25.0f), sf::Vector2f(5.0f, 0.0f), 1.0f, true, false);
     MovingColliders collider2(world, sf::Vector2f(25.0f, 20.0f), sf::Vector2f(0.0f, 4.f), 1.0f, false, true);
 
@@ -152,7 +152,7 @@ int main() {
     // List for removal
     std::vector<Collectible*> toRemove;
     bool isJumping = false;
-    MyContactListener contactListener(ball, collectibles, toRemove, isJumping, water, flag, maximizeBalls, minimizeBalls, toRemoveMax, toRemoveMin);
+    MyContactListener contactListener(ball, collectibles, toRemove, isJumping, water, flag, maximizeBalls, minimizeBalls, toRemoveMax, toRemoveMin ,spike);
     int currentSceneX = 0; // Current scene X index
     int currentSceneY = 0; // Current scene Y index
     int currentScene = 0;
@@ -278,6 +278,10 @@ int main() {
                 currentSceneY * WINDOW_HEIGHT + WINDOW_HEIGHT / 2);
             window.setView(view);
         }
+        
+
+        // Render spikes
+        
         ball.update(deltaTime);
         water.update(deltaTime);
         flag.update();
@@ -293,12 +297,18 @@ int main() {
             ball.setScore(ball.getScore() + 1);
         }
         toRemove.clear();
-
         // Render everything
+        //for (Spike* spike : spikes) {
+        //    delete spike; // Free the memory for each Spike
+        //}
+        //spikes.clear();
+        
+
         window.clear();
         
         window.draw(backgroundSprite);
         water.draw(window);
+        spike.draw(window);
         gridMap.drawWalls(window, levelGrid, cellSizeX, cellSizeY, sceneView);
         for (auto& collectible : collectibles) {
             collectible->draw(window);
@@ -313,6 +323,7 @@ int main() {
             minimizeBall->update();
             minimizeBall->draw(window);
         }
+        
         flag.draw(window);
         ball.draw(window);
         window.display();

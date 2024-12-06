@@ -6,16 +6,18 @@
 #include "Water.h"
 #include "MaximizeBall.h"
 #include "MinimizeBall.h"
+#include "Spike.h"
 class MyContactListener : public b2ContactListener {
 public:
     MyContactListener(Ball& ball, std::vector<Collectible*>& collectibles, std::vector<Collectible*>& toRemove, bool& jumpFlag, Water& water, Flag& flag, std::vector<MaximizeBall*>& maximizeBalls,
         std::vector<MinimizeBall*>& minimizeBalls,
         std::vector<MaximizeBall*>& toRemoveMax,
-        std::vector<MinimizeBall*>& toRemoveMin)
+        std::vector<MinimizeBall*>& toRemoveMin,
+        Spike& spike)
         : ball(ball), maximizeBalls(maximizeBalls),
         minimizeBalls(minimizeBalls),
         toRemoveMax(toRemoveMax),
-        toRemoveMin(toRemoveMin), collectibles(collectibles), toRemove(toRemove), isJumping(jumpFlag), water(water), flag(flag) {
+        toRemoveMin(toRemoveMin), collectibles(collectibles), toRemove(toRemove), isJumping(jumpFlag), water(water), flag(flag), spike(spike) {
     }
 
     void BeginContact(b2Contact* contact) override {
@@ -41,6 +43,13 @@ public:
             }
             water.startWaveEffect(); // Trigger wave effect
         }
+        
+        if ((bodyA == ball.getBody() && bodyB == spike.getBody()) || (bodyB == ball.getBody() && bodyA == spike.getBody())) {
+            printf("sddddddddddddddddd"); // Test the log
+            ball.decreaseLives();         // Trigger action
+            ball.respawn();
+        }
+        
 
         // Ball collides with flag
         if ((bodyA == ball.getBody() && bodyB == flag.getBody()) ||
@@ -51,7 +60,7 @@ public:
             printf("Winner!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
             printf("Winner!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
             flag.onCollision();
-
+            ball.setCheckpoint(flag.getposition());
         }
         for (auto& minimizeBall : minimizeBalls) {
             if (bodyA == minimizeBall->getBody() || bodyB == minimizeBall->getBody()) {
@@ -89,7 +98,9 @@ public:
 
 private:
     Ball& ball;
+    
     std::vector<Collectible*>& collectibles;
+    Spike& spike;
     std::vector<Collectible*>& toRemove;
     bool& isJumping;
     Water& water;

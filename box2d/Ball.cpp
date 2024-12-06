@@ -3,16 +3,17 @@
 
 Ball::Ball(b2World* world, float x, float y, const sf::Texture& texture)
 {
+    this->world = world;
     isNormal = true;
     // Create a Box2D body for the ball
     bodyDef.type = b2_dynamicBody;
     bodyDef.position.Set(x / SCALE, y / SCALE);  // Convert from SFML units to Box2D units
     body = world->CreateBody(&bodyDef);
-
+    checkpoint = sf::Vector2f(x, y);
     // Create a circular shape for the ball
-    b2CircleShape circleShape;
+    
     circleShape.m_radius = 20.0f / SCALE;  // Convert radius to Box2D units
-
+    
     b2FixtureDef fixtureDef;
     fixtureDef.shape = &circleShape;
     fixtureDef.density = 1.0f;   // Mass of the ball
@@ -30,6 +31,25 @@ Ball::Ball(b2World* world, float x, float y, const sf::Texture& texture)
     shape.setTexture(&ballTexture);
     waveEffectActive = false;
     waveTime = 0.0f;
+
+}
+void Ball::decreaseLives() {
+    if (lives > 0) {
+        lives--;
+    }
+    if (lives == 0) {
+        // Handle game over logic
+        std::cout << "Game Over!" << std::endl;
+    }
+}
+void Ball::respawn() {
+    isRespawn = true;
+    //bodyDef.position.Set(checkpoint.x / SCALE, checkpoint.y / SCALE);  // Convert from SFML units to Box2D units
+    
+}
+
+void Ball::setCheckpoint(const sf::Vector2f& checkpoint) {
+    this->checkpoint = checkpoint;
 }
 const float Ball::SCALE = 30.0f;
 void Ball::update(float deltaTime) {
@@ -57,6 +77,12 @@ void Ball::update(float deltaTime) {
             float scale = 1.0f + 0.1f * sin(waveTime * 5);
             body->SetLinearVelocity(b2Vec2(0.0, -scale));
         }
+    }
+    if (isRespawn) {
+        body->SetTransform(b2Vec2(checkpoint.x / SCALE, checkpoint.y / SCALE), body->GetAngle());
+        body->SetLinearVelocity(b2Vec2(0, 0));
+        body->SetAngularVelocity(0.0f);
+        isRespawn = false;
     }
 }
 void Ball::startWaveEffect() {
