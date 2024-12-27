@@ -35,9 +35,9 @@ int main() {
     sf::View sceneView(sf::FloatRect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT)); // View for the current scene
     sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
     //sf::RenderWindow window(desktopMode, "Full Grid Display", sf::Style::Fullscreen);
-    sf::RenderWindow window(sf::VideoMode(1600, 1200), "Bounce", sf::Style::Default);
+    sf::RenderWindow window(sf::VideoMode(1200, 900), "Bounce", sf::Style::Default);
     sf::View view;
-    view.setCenter(desktopMode.width / 2, desktopMode.height / 3);  // Center of the screen
+    view.setCenter(desktopMode.width / 2, desktopMode.height / 2);  // Center of the screen
     view.setSize(desktopMode.width, desktopMode.height);            // Match the full screen size
     window.setView(view);
     //window.setView(sceneView);
@@ -46,7 +46,7 @@ int main() {
     int cellSizeY = WINDOW_HEIGHT / SCENE_HEIGHT; // Grid cell height
 
     // Initialize Box2D world with gravity
-    b2Vec2 gravity(0.0f, 9.8f);
+    b2Vec2 gravity(0.0f, 5.0f);
     b2World world(gravity);
     //world.IsLocked()
     // Load the grid and textures
@@ -90,7 +90,6 @@ int main() {
 
     backgroundTexture.loadFromFile("Textures/sky bb.png");
     backgroundSprite.setTexture(backgroundTexture);
-
     // Calculate scale factors to cover both axes
     float scaleX = static_cast<float>(WINDOW_WIDTH) / backgroundTexture.getSize().x;
     float scaleY = static_cast<float>(WINDOW_HEIGHT) / backgroundTexture.getSize().y;
@@ -104,18 +103,12 @@ int main() {
     float offsetY = (WINDOW_HEIGHT - (backgroundTexture.getSize().y * uniformScale))/* / 1.0f*/;
     backgroundSprite.setPosition(offsetX, offsetY);
 
-    //// Get the window size and scale the background
-    //sf::Vector2u windowSize = window.getSize();
-    //sf::Vector2u textureSize = backgroundTexture.getSize();
-    //float scaleX = static_cast<float>(windowSize.x) / textureSize.x;
-    //float scaleY = scaleX;
-    //backgroundSprite.setScale(scaleX, scaleY);
-
-
-    //backgroundSprite.setScale(
-    //    windowSize.x / backgroundTexture.getSize().x,
-    //    windowSize.y/ 2 / backgroundTexture.getSize().y
-    //);
+    // Get the window size and scale the background
+    /*sf::Vector2u windowSize = window.getSize();
+    backgroundSprite.setScale(
+        windowSize.x / backgroundTexture.getSize().x,
+        windowSize.y / backgroundTexture.getSize().y
+    );*/
 
     // Assume each cell in the grid has a sprite or character
     int cellWidth = 32;  // Width of each cell in the grid
@@ -150,14 +143,16 @@ int main() {
     }
 
     // Create a ball object
-    Ball ball(&world, 80, 150, ballTexture);
-    Flag flag(&world, 1000.0f, 800.0f, 100.0f, 100.0f, "Textures/flag.png");
-    Water water(&world, 529, 1050, 262, 500);
+    Ball ball(&world, 80, 200, ballTexture);
+    Flag flag(&world,300.0f, 820.0f, 100.0f, 100.0f, "Textures/flag.png");
+    Water water(&world, 1351, 740, 135, 170);
     
-    Spike spike(&world, sf::Vector2f( 230.0f, 230.0f ), sf::Vector2f( 100.0f, 100.0f ), "Textures/spike.png");
+    Spike spike(&world, sf::Vector2f(300.0f, 737.0f ), sf::Vector2f( 50.0f, 50.0f ), "Textures/spike.png");
+    std::vector<MovingColliders*> colliders;
     MovingColliders collider(world, sf::Vector2f(22.5f, 25.0f), sf::Vector2f(5.0f, 0.0f), 1.0f, true, false);
     MovingColliders collider2(world, sf::Vector2f(25.0f, 20.0f), sf::Vector2f(0.0f, 4.f), 1.0f, false, true);
-
+    colliders.push_back(&collider);
+    colliders.push_back(&collider2);
     std::vector<Collectible*> collectibles;
     collectibles.push_back(new Collectible(&world, 200, 200));
     collectibles.push_back(new Collectible(&world, 850, 400));
@@ -172,7 +167,7 @@ int main() {
     // List for removal
     std::vector<Collectible*> toRemove;
     bool isJumping = false;
-    MyContactListener contactListener(ball, collectibles, toRemove, isJumping, water, flag, maximizeBalls, minimizeBalls, toRemoveMax, toRemoveMin ,spike);
+    MyContactListener contactListener(ball, collectibles, toRemove, isJumping, water, flag, maximizeBalls, minimizeBalls, toRemoveMax, toRemoveMin ,spike ,colliders);
     int currentSceneX = 0; // Current scene X index
     int currentSceneY = 0; // Current scene Y index
     int currentScene = 0;
