@@ -1,6 +1,6 @@
 #include "Grid.h"
-int cellSizeX = WINDOW_WIDTH / SCENE_WIDTH;  // Grid cell width
-int cellSizeY = WINDOW_HEIGHT / SCENE_HEIGHT; // Grid cell height
+int cellSizeX = WINDOW_WIDTH /*/ SCENE_WIDTH*/;  // Grid cell width
+int cellSizeY = WINDOW_HEIGHT /*/ SCENE_HEIGHT*/; // Grid cell height
 void Grid::loadGrid(const std::string& path, std::vector<std::vector<char>>& grid, std::vector<Position>& emptyPositions) {
     std::ifstream myfile(path, std::ios_base::in);
 
@@ -95,6 +95,33 @@ void Grid::drawWalls(sf::RenderWindow& window, const std::vector<std::vector<cha
     }
 }
 
+//void Grid::drawWalls(sf::RenderWindow& window, const std::vector<std::vector<char>>& grid, int cellSizeX, int cellSizeY, sf::View& view) {
+//    // Ensure full grid scaling
+//    sf::Vector2f center = view.getCenter();
+//    sf::Vector2f size = view.getSize();
+//
+//    for (size_t row = 0; row < grid.size(); ++row) {
+//        for (size_t col = 0; col < grid[row].size(); ++col) {
+//            sf::RectangleShape cell(sf::Vector2f(cellSizeX, cellSizeY));
+//            cell.setPosition(col * cellSizeX, row * cellSizeY);
+//
+//            char gridChar = grid[row][col];
+//            if (charToTextureIndex.find(gridChar) != charToTextureIndex.end()) {
+//                int textureIndex = charToTextureIndex[gridChar];
+//                cell.setTexture(&textures[textureIndex]);
+//
+//                // Scale texture to fit the cell
+//                sf::Vector2u textureSize = textures[textureIndex].getSize();
+//                float scaleX = static_cast<float>(cellSizeX) / textureSize.x;
+//                float scaleY = static_cast<float>(cellSizeY) / textureSize.y;
+//                cell.setTextureRect(sf::IntRect(0, 0, textureSize.x, textureSize.y));
+//                cell.setScale(scaleX, scaleY);
+//            }
+//
+//            window.draw(cell);
+//        }
+//    }
+//}
 
 void Grid::switchView(sf::RenderWindow& window, sf::View& view, int scene, const b2Vec2& playerCircle) {
     sf::Vector2f playerPosition(playerCircle.x, playerCircle.y);

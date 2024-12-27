@@ -32,6 +32,7 @@
     <ClCompile Include="MovingColliders.cpp" />
     <ClCompile Include="MyContactListener.cpp" />
     <ClCompile Include="SkinSelector.cpp" />
+    <ClCompile Include="Spike.cpp" />
     <ClCompile Include="Water.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -45,6 +46,7 @@
     <ClInclude Include="MovingColliders.h" />
     <ClInclude Include="MyContactListener.h" />
     <ClInclude Include="SkinSelector.h" />
+    <ClInclude Include="Spike.h" />
     <ClInclude Include="Water.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

@@ -34,9 +34,10 @@ int main() {
     //sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Bounce");
     sf::View sceneView(sf::FloatRect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT)); // View for the current scene
     sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
-    sf::RenderWindow window(desktopMode, "Full Grid Display", sf::Style::Fullscreen);
+    //sf::RenderWindow window(desktopMode, "Full Grid Display", sf::Style::Fullscreen);
+    sf::RenderWindow window(sf::VideoMode(1600, 1200), "Bounce", sf::Style::Default);
     sf::View view;
-    view.setCenter(desktopMode.width / 2, desktopMode.height / 2);  // Center of the screen
+    view.setCenter(desktopMode.width / 2, desktopMode.height / 3);  // Center of the screen
     view.setSize(desktopMode.width, desktopMode.height);            // Match the full screen size
     window.setView(view);
     //window.setView(sceneView);
@@ -90,12 +91,31 @@ int main() {
     backgroundTexture.loadFromFile("Textures/sky bb.png");
     backgroundSprite.setTexture(backgroundTexture);
 
-    // Get the window size and scale the background
-    sf::Vector2u windowSize = window.getSize();
-    backgroundSprite.setScale(
-        windowSize.x / backgroundTexture.getSize().x,
-        windowSize.y / backgroundTexture.getSize().y
-    );
+    // Calculate scale factors to cover both axes
+    float scaleX = static_cast<float>(WINDOW_WIDTH) / backgroundTexture.getSize().x;
+    float scaleY = static_cast<float>(WINDOW_HEIGHT) / backgroundTexture.getSize().y;
+
+    // Use the larger scale to ensure full screen coverage
+    float uniformScale = std::max(scaleX, scaleY);
+    backgroundSprite.setScale(uniformScale, uniformScale);
+
+    // Center the background if it exceeds in any direction
+    float offsetX = (WINDOW_WIDTH - (backgroundTexture.getSize().x * uniformScale)) / 3.0f;
+    float offsetY = (WINDOW_HEIGHT - (backgroundTexture.getSize().y * uniformScale))/* / 1.0f*/;
+    backgroundSprite.setPosition(offsetX, offsetY);
+
+    //// Get the window size and scale the background
+    //sf::Vector2u windowSize = window.getSize();
+    //sf::Vector2u textureSize = backgroundTexture.getSize();
+    //float scaleX = static_cast<float>(windowSize.x) / textureSize.x;
+    //float scaleY = scaleX;
+    //backgroundSprite.setScale(scaleX, scaleY);
+
+
+    //backgroundSprite.setScale(
+    //    windowSize.x / backgroundTexture.getSize().x,
+    //    windowSize.y/ 2 / backgroundTexture.getSize().y
+    //);
 
     // Assume each cell in the grid has a sprite or character
     int cellWidth = 32;  // Width of each cell in the grid
