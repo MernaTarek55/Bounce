@@ -14,7 +14,7 @@ void playBackgroundMusic(SoundBuffer& buffer, Sound& sound) {
     if (buffer.loadFromFile("Textures/Sounds/music.mp3")) {
         sound.setBuffer(buffer);
         sound.setLoop(true); // Optional: loops the sound continuously
-        sound.setVolume(10); // Set volume (adjust as needed)
+        sound.setVolume(0); // Set volume (adjust as needed)
         sound.play();
     }
     else {
@@ -149,13 +149,14 @@ int main() {
     
     Spike spike(&world, sf::Vector2f(300.0f, 737.0f ), sf::Vector2f( 50.0f, 50.0f ), "Textures/spike.png");
     std::vector<MovingColliders*> colliders;
-    MovingColliders collider(world, sf::Vector2f(22.5f, 25.0f), sf::Vector2f(5.0f, 0.0f), 1.0f, true, false);
+    MovingColliders collider(world, sf::Vector2f(49.f, 15.0f), sf::Vector2f(5.0f, 0.0f), 1.0f, true, false);
     MovingColliders collider2(world, sf::Vector2f(25.0f, 20.0f), sf::Vector2f(0.0f, 4.f), 1.0f, false, true);
     colliders.push_back(&collider);
     colliders.push_back(&collider2);
     std::vector<Collectible*> collectibles;
     collectibles.push_back(new Collectible(&world, 200, 200));
     collectibles.push_back(new Collectible(&world, 850, 400));
+    collectibles.push_back(new Collectible(&world, 1600, 800));
     std::vector<MaximizeBall*> maximizeBalls;
     maximizeBalls.push_back(new MaximizeBall(&world, 300, 200, "Textures/size up.png"));
 
