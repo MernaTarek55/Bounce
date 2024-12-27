@@ -23,7 +23,7 @@ MovingColliders::MovingColliders(b2World& world, sf::Vector2f startPosition, sf:
     fixtureDef.shape = &boxShape;
     fixtureDef.density = 1.0f;
     fixtureDef.friction = 0.3f;
-
+    fixtureDef.isSensor = true;
     movObs->CreateFixture(&fixtureDef);
     // Initialize SFML rectangle for visualization
     s.x = 10.0;
@@ -86,7 +86,10 @@ void MovingColliders::updateColliderY(float deltaTime) {
     movObs->SetTransform(position, movObs->GetAngle());
 }
 
-
+b2Body* MovingColliders::getBody()
+{
+    return movObs;
+}
 void MovingColliders::renderCollider(sf::RenderWindow& window) {
     // Increment rotation angle for continuous rotation
     rotationAngle += 1.0f; // Adjust the increment value for different rotation speeds
