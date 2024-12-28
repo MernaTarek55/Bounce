@@ -8,6 +8,7 @@
 #include "MinimizeBall.h"
 #include "Spike.h"
 #include "MovingColliders.h"
+#include "MainMenu.h"
 class MyContactListener : public b2ContactListener {
 public:
     MyContactListener(Ball& ball, std::vector<Collectible*>& collectibles, std::vector<Collectible*>& toRemove, bool& jumpFlag, Water& water, Flag& flag, std::vector<MaximizeBall*>& maximizeBalls,
@@ -63,11 +64,11 @@ public:
         // Ball collides with flag
         if ((bodyA == ball.getBody() && bodyB == flag.getBody()) ||
             (bodyB == ball.getBody() && bodyA == flag.getBody())) {
-            printf("Winner!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
-            printf("Winner!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
-            printf("Winner!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
-            printf("Winner!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
-            printf("Winner!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+            printf("Winner!!! Chicken!!! Dinner!!!\n");
+            printf("Winner!!! Chicken!!! Dinner!!!\n");
+            printf("Winner!!! Chicken!!! Dinner!!!\n");
+            printf("Winner!!! Chicken!!! Dinner!!!\n");
+            printf("Winner!!! Chicken!!! Dinner!!!\n");
             flag.onCollision();
             ball.setCheckpoint(sf::Vector2f(flag.getposition().x , flag.getposition().y-50));
         }

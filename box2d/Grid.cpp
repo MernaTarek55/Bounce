@@ -51,8 +51,9 @@ void Grid::initializePhysics(b2World& world, const std::vector<std::vector<char>
     for (size_t row = 0; row < grid.size(); ++row) {
         for (size_t col = 0; col < grid[row].size(); ++col) {
             char gridChar = grid[row][col];
-            if (gridChar == 'X' || gridChar == 'C' || gridChar == 'Z') {
-                // Create static Box2D body for ground/walls
+
+            // Create Box2D body for specific characters
+            if (gridChar == 'X' || gridChar == 'Z') {
                 b2BodyDef bodyDef;
                 bodyDef.position.Set(col * (float)cellSizeXX / SCALE, row * (float)cellSizeYY / SCALE);
                 bodyDef.type = b2_staticBody;
@@ -63,6 +64,55 @@ void Grid::initializePhysics(b2World& world, const std::vector<std::vector<char>
                 b2Body* groundBody = world.CreateBody(&bodyDef);
                 groundBody->CreateFixture(&groundShape, 0.0f);
             }
+
+            else if (gridChar == 'C') {
+                b2BodyDef bodyDef;
+                bodyDef.position.Set(col * (float)cellSizeXX / SCALE, row * (float)cellSizeYY / SCALE);
+                bodyDef.type = b2_staticBody;
+
+                // Define a triangular shape with the vertices top-left, bottom-left, bottom-right
+                b2PolygonShape triangleShape;
+                b2Vec2 vertices[3]; // Three vertices for a triangle
+
+                vertices[0].Set(0.0f, 0.0f);                           // Top-left (origin)
+                vertices[1].Set(0.0f, cellSizeYY / SCALE);             // Bottom-left
+                vertices[2].Set(cellSizeXX / SCALE, cellSizeYY / SCALE); // Bottom-right
+
+                triangleShape.Set(vertices, 3); // Set the triangle shape
+
+                b2Body* triangleBody = world.CreateBody(&bodyDef);
+                triangleBody->CreateFixture(&triangleShape, 0.0f);
+            }
+
+
+            //// Create concave shapes for 'C' and 'O'
+            //else if (gridChar == 'C' || gridChar == 'O') {
+            //    b2BodyDef bodyDef;
+            //    bodyDef.position.Set(col * (float)cellSizeXX / SCALE, row * (float)cellSizeYY / SCALE);
+            //    bodyDef.type = b2_staticBody;
+
+            //    b2PolygonShape concaveShape;
+            //    b2Vec2 vertices[4];
+
+            //    if (gridChar == 'C') {
+            //        // Define a concave shape for 'C'
+            //        vertices[0].Set(-0.5f * cellSizeXX / SCALE, -0.5f * cellSizeYY / SCALE);
+            //        vertices[1].Set(0.5f * cellSizeXX / SCALE, -0.5f * cellSizeYY / SCALE);
+            //        vertices[2].Set(0.0f * cellSizeXX / SCALE, 0.5f * cellSizeYY / SCALE);
+            //        vertices[3].Set(-0.5f * cellSizeXX / SCALE, 0.5f * cellSizeYY / SCALE);
+            //    }
+            //    else if (gridChar == 'O') {
+            //        // Define a concave shape for 'O'
+            //        vertices[0].Set(-0.5f * cellSizeXX / SCALE, -0.5f * cellSizeYY / SCALE);
+            //        vertices[1].Set(0.5f * cellSizeXX / SCALE, -0.5f * cellSizeYY / SCALE);
+            //        vertices[2].Set(0.5f * cellSizeXX / SCALE, 0.5f * cellSizeYY / SCALE);
+            //        vertices[3].Set(-0.5f * cellSizeXX / SCALE, 0.0f * cellSizeYY / SCALE);
+            //    }
+
+            //    concaveShape.Set(vertices, 4);
+            //    b2Body* concaveBody = world.CreateBody(&bodyDef);
+            //    concaveBody->CreateFixture(&concaveShape, 0.0f);
+            //}
         }
     }
 }
@@ -123,67 +173,67 @@ void Grid::drawWalls(sf::RenderWindow& window, const std::vector<std::vector<cha
 //    }
 //}
 
-void Grid::switchView(sf::RenderWindow& window, sf::View& view, int scene, const b2Vec2& playerCircle) {
-    sf::Vector2f playerPosition(playerCircle.x, playerCircle.y);
-
-    // Get the full screen resolution
-    sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
-    int fullGridHeight, fullGridWidth, gridHeight, gridWidth;
-    switch (scene) {
-    case 0: // Full grid view
-        // Set the view to display the entire grid
-        // Calculate grid dimensions
-        gridWidth = sizeof(grid[0]) / sizeof(grid[0][0]); // 48 columns
-        gridHeight = sizeof(grid) / sizeof(grid[0]);      // 15 rows
-
-        // You can use these dimensions for full grid calculation
-        fullGridWidth = gridWidth * cellSizeX;
-        fullGridHeight = gridHeight * cellSizeY;
-
-        // Center the view and adjust size to fit the full grid on the screen
-        view.setCenter(fullGridWidth / 2, fullGridHeight / 2);
-        view.setSize(fullGridWidth, fullGridHeight);
-        break;
-
-    case 1: // Vertical split
-        if (playerPosition.x < desktopMode.width / 2) {
-            view.setCenter(desktopMode.width / 4, desktopMode.height / 2);
-        }
-        else {
-            view.setCenter(3 * desktopMode.width / 4, desktopMode.height / 2);
-        }
-        view.setSize(desktopMode.width / 2, desktopMode.height);
-        break;
-
-    case 2: // Four quadrants
-        if (playerPosition.x < desktopMode.width / 2) {
-            if (playerPosition.y < desktopMode.height / 2) {
-                view.setCenter(desktopMode.width / 4, desktopMode.height / 4); // Top-left quadrant
-            }
-            else {
-                view.setCenter(desktopMode.width / 4, 3 * desktopMode.height / 4); // Bottom-left quadrant
-            }
-        }
-        else {
-            if (playerPosition.y < desktopMode.height / 2) {
-                view.setCenter(3 * desktopMode.width / 4, desktopMode.height / 4); // Top-right quadrant
-            }
-            else {
-                view.setCenter(3 * desktopMode.width / 4, 3 * desktopMode.height / 4); // Bottom-right quadrant
-            }
-        }
-        view.setSize(desktopMode.width / 2, desktopMode.height / 2);
-        break;
-
-    case 3: // Player-focused view
-        view.setCenter(playerPosition.x, playerPosition.y);
-        view.setSize(player_Scene_WIDTH * SCALE, player_Scene_HEIGHT * SCALE);
-        break;
-
-    default:
-        std::cerr << "Invalid scene index." << std::endl;
-        break;
-    }
-
-    window.setView(view);
-}
+//void Grid::switchView(sf::RenderWindow& window, sf::View& view, int scene, const b2Vec2& playerCircle) {
+//    sf::Vector2f playerPosition(playerCircle.x, playerCircle.y);
+//
+//    // Get the full screen resolution
+//    sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
+//    int fullGridHeight, fullGridWidth, gridHeight, gridWidth;
+//    switch (scene) {
+//    case 0: // Full grid view
+//        // Set the view to display the entire grid
+//        // Calculate grid dimensions
+//        gridWidth = sizeof(grid[0]) / sizeof(grid[0][0]); // 48 columns
+//        gridHeight = sizeof(grid) / sizeof(grid[0]);      // 15 rows
+//
+//        // You can use these dimensions for full grid calculation
+//        fullGridWidth = gridWidth * cellSizeX;
+//        fullGridHeight = gridHeight * cellSizeY;
+//
+//        // Center the view and adjust size to fit the full grid on the screen
+//        view.setCenter(fullGridWidth / 2, fullGridHeight / 2);
+//        view.setSize(fullGridWidth, fullGridHeight);
+//        break;
+//
+//    case 1: // Vertical split
+//        if (playerPosition.x < desktopMode.width / 2) {
+//            view.setCenter(desktopMode.width / 4, desktopMode.height / 2);
+//        }
+//        else {
+//            view.setCenter(3 * desktopMode.width / 4, desktopMode.height / 2);
+//        }
+//        view.setSize(desktopMode.width / 2, desktopMode.height);
+//        break;
+//
+//    case 2: // Four quadrants
+//        if (playerPosition.x < desktopMode.width / 2) {
+//            if (playerPosition.y < desktopMode.height / 2) {
+//                view.setCenter(desktopMode.width / 4, desktopMode.height / 4); // Top-left quadrant
+//            }
+//            else {
+//                view.setCenter(desktopMode.width / 4, 3 * desktopMode.height / 4); // Bottom-left quadrant
+//            }
+//        }
+//        else {
+//            if (playerPosition.y < desktopMode.height / 2) {
+//                view.setCenter(3 * desktopMode.width / 4, desktopMode.height / 4); // Top-right quadrant
+//            }
+//            else {
+//                view.setCenter(3 * desktopMode.width / 4, 3 * desktopMode.height / 4); // Bottom-right quadrant
+//            }
+//        }
+//        view.setSize(desktopMode.width / 2, desktopMode.height / 2);
+//        break;
+//
+//    case 3: // Player-focused view
+//        view.setCenter(playerPosition.x, playerPosition.y);
+//        view.setSize(player_Scene_WIDTH * SCALE, player_Scene_HEIGHT * SCALE);
+//        break;
+//
+//    default:
+//        std::cerr << "Invalid scene index." << std::endl;
+//        break;
+//    }
+//
+//    window.setView(view);
+//}

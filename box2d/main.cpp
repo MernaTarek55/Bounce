@@ -14,15 +14,17 @@ void playBackgroundMusic(SoundBuffer& buffer, Sound& sound) {
     if (buffer.loadFromFile("Textures/Sounds/music.mp3")) {
         sound.setBuffer(buffer);
         sound.setLoop(true); // Optional: loops the sound continuously
-        sound.setVolume(0); // Set volume (adjust as needed)
+        sound.setVolume(100); // Set volume (adjust as needed)
         sound.play();
     }
     else {
         cerr << "Error: Could not load background music." << endl;
     }
 }
+
 MenuOption mainMenu();
 std::string SelectSkin();
+
 int main() {
     std::string t = "Textures/ball final.png";
     MenuOption option = mainMenu();
@@ -31,16 +33,13 @@ int main() {
     }
     if( option == MenuOption::Exit)
         return 0;
-    //sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Bounce");
     sf::View sceneView(sf::FloatRect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT)); // View for the current scene
     sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
-    //sf::RenderWindow window(desktopMode, "Full Grid Display", sf::Style::Fullscreen);
     sf::RenderWindow window(sf::VideoMode(1200, 900), "Bounce", sf::Style::Default);
     sf::View view;
     view.setCenter(desktopMode.width / 2, desktopMode.height / 2);  // Center of the screen
     view.setSize(desktopMode.width, desktopMode.height);            // Match the full screen size
     window.setView(view);
-    //window.setView(sceneView);
 
     int cellSizeX = WINDOW_WIDTH / SCENE_WIDTH;  // Grid cell width
     int cellSizeY = WINDOW_HEIGHT / SCENE_HEIGHT; // Grid cell height
@@ -72,19 +71,6 @@ int main() {
         "Textures/TILE BRICK ground tilt opposite.png"
     };
 
-    //sf::Texture backgroundTexture;
-    //if (!backgroundTexture.loadFromFile("Textures/sky bb.png")) {
-    //    std::cerr << "Error: Could not load background texture." << std::endl;
-    //    return EXIT_FAILURE;
-    //}
-    //sf::Sprite backgroundSprite;
-    //backgroundSprite.setTexture(backgroundTexture);
-
-    //// Scale the background to fit the entire window
-    //backgroundSprite.setScale(
-    //    static_cast<float>(WINDOW_WIDTH) / backgroundTexture.getSize().x,
-    //    static_cast<float>(WINDOW_HEIGHT) / backgroundTexture.getSize().y
-    //);
     sf::Texture backgroundTexture;
     sf::Sprite backgroundSprite;
 
@@ -103,34 +89,20 @@ int main() {
     float offsetY = (WINDOW_HEIGHT - (backgroundTexture.getSize().y * uniformScale))/* / 1.0f*/;
     backgroundSprite.setPosition(offsetX, offsetY);
 
-    // Get the window size and scale the background
-    /*sf::Vector2u windowSize = window.getSize();
-    backgroundSprite.setScale(
-        windowSize.x / backgroundTexture.getSize().x,
-        windowSize.y / backgroundTexture.getSize().y
-    );*/
-
     // Assume each cell in the grid has a sprite or character
     int cellWidth = 32;  // Width of each cell in the grid
     int cellHeight = 32; // Height of each cell in the grid
+
+    sf::View gridView;
+    gridView.setCenter(levelGrid[0].size() * cellSizeX / 2.0f, levelGrid.size() * cellSizeY / 2.0f);
+    gridView.setSize(levelGrid[0].size() * cellSizeX, levelGrid.size() * cellSizeY);
+    window.setView(gridView);
 
     if (!gridMap.loadTextures(texturePaths)) {
         return EXIT_FAILURE;
     }
 
     gridMap.initializePhysics(world, levelGrid, cellSizeX, cellSizeY);
-
-    //sf::Texture& backgroundTexture = gridMap.getTexture(4);
-    //std::cout << "Texture size: "
-    //    << backgroundTexture.getSize().x << " x "
-    //    << backgroundTexture.getSize().y << std::endl;
-
-    //sf::Sprite background;
-    //background.setTexture(backgroundTexture);
-    //background.setScale(
-    //    static_cast<float>(WINDOW_WIDTH) / backgroundTexture.getSize().x,
-    //    static_cast<float>(WINDOW_HEIGHT) / backgroundTexture.getSize().y
-    //);
 
     // Use texture 15 for the player
     sf::Texture* playerTexture = &gridMap.getTexture(15);
@@ -162,6 +134,7 @@ int main() {
 
     std::vector<MinimizeBall*> minimizeBalls;
     minimizeBalls.push_back(new MinimizeBall(&world, 400, 200, "Textures/size down.png"));
+    minimizeBalls.push_back(new MinimizeBall(&world, 1800, 300, "Textures/size down.png"));
 
     std::vector<MaximizeBall*> toRemoveMax;
     std::vector<MinimizeBall*> toRemoveMin;
@@ -219,44 +192,25 @@ int main() {
                     }
                 }
             }
-            switch (event.key.code) {
-            case sf::Keyboard::Num1:
-                currentScene = 0; // Full view
-                break;
-            case sf::Keyboard::Num2:
-                currentScene = 1; // Vertical split
-                break;
-            case sf::Keyboard::Num3:
-                currentScene = 2; // Four quadrants
-                break;
-            case sf::Keyboard::Num4:
-                currentScene = 3; // Player-focused
-                break;
-            case sf::Keyboard::Num5:
-                currentScene = 3; // Player-focused
-                break;
-            default:    
-                break;
-            }
+            //currentScene = 0; // Full view
+            //gridMap.switchView(window, sceneView, currentScene, ball.GetPosition());
+            //if (event.type == sf::Event::Resized) {
+            //    float newWidth = static_cast<float>(event.size.width);
+            //    float newHeight = static_cast<float>(event.size.height);
 
-            gridMap.switchView(window, sceneView, currentScene, ball.GetPosition());
-            if (event.type == sf::Event::Resized) {
-                float newWidth = static_cast<float>(event.size.width);
-                float newHeight = static_cast<float>(event.size.height);
+            //    float aspectRatio = newWidth / newHeight;
 
-                float aspectRatio = newWidth / newHeight;
+            //    if (aspectRatio > WINDOW_WIDTH / WINDOW_HEIGHT) {
+            //        float newViewWidth = WINDOW_HEIGHT * aspectRatio;
+            //        sceneView.setSize(newViewWidth, WINDOW_HEIGHT);
+            //    }
+            //    else {
+            //        float newViewHeight = WINDOW_HEIGHT / aspectRatio;
+            //        sceneView.setSize(WINDOW_HEIGHT, newViewHeight);
+            //    }
 
-                if (aspectRatio > WINDOW_WIDTH / WINDOW_HEIGHT) {
-                    float newViewWidth = WINDOW_HEIGHT * aspectRatio;
-                    sceneView.setSize(newViewWidth, WINDOW_HEIGHT);
-                }
-                else {
-                    float newViewHeight = WINDOW_HEIGHT / aspectRatio;
-                    sceneView.setSize(WINDOW_HEIGHT, newViewHeight);
-                }
-
-                window.setView(view);
-            }
+            //    window.setView(view);
+            //}
         }
         for (auto& m : maximizeBalls) {
             m->update();
@@ -313,19 +267,13 @@ int main() {
             ball.setScore(ball.getScore() + 1);
         }
         toRemove.clear();
-        // Render everything
-        //for (Spike* spike : spikes) {
-        //    delete spike; // Free the memory for each Spike
-        //}
-        //spikes.clear();
-        
 
         window.clear();
         
         window.draw(backgroundSprite);
         water.draw(window);
         spike.draw(window);
-        gridMap.drawWalls(window, levelGrid, cellSizeX, cellSizeY, sceneView);
+        gridMap.drawWalls(window, levelGrid, cellSizeX, cellSizeY, gridView);
         for (auto& collectible : collectibles) {
             collectible->draw(window);
         }
