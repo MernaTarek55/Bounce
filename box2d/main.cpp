@@ -26,6 +26,7 @@ MenuOption mainMenu();
 std::string SelectSkin();
 
 int main() {
+    mainmenu:
     std::string t = "Textures/ball final.png";
     MenuOption option = mainMenu();
     if (option == MenuOption::Levels) {
@@ -119,7 +120,7 @@ int main() {
     Flag flag(&world,300.0f, 820.0f, 100.0f, 100.0f, "Textures/flag.png");
     Water water(&world, 1351, 740, 135, 170);
     
-    Spike spike(&world, sf::Vector2f(300.0f, 737.0f ), sf::Vector2f( 50.0f, 50.0f ), "Textures/spike.png");
+    Spike spike(&world, sf::Vector2f(350.0f, 737.0f ), sf::Vector2f( 50.0f, 50.0f ), "Textures/spike.png");
     std::vector<MovingColliders*> colliders;
     MovingColliders collider(world, sf::Vector2f(49.f, 15.0f), sf::Vector2f(5.0f, 0.0f), 1.0f, true, false);
     MovingColliders collider2(world, sf::Vector2f(25.0f, 20.0f), sf::Vector2f(0.0f, 4.f), 1.0f, false, true);
@@ -266,6 +267,7 @@ int main() {
             delete collectible; // Free memory
             ball.setScore(ball.getScore() + 1);
         }
+        if (ball.die)goto mainmenu;
         toRemove.clear();
 
         window.clear();
